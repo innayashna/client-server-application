@@ -1,5 +1,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <iostream>
 
 int main(int argc, char const *argv[])
 {
@@ -15,4 +16,9 @@ int main(int argc, char const *argv[])
     listen(server_socket, 5);
 
     int client_socket = accept(server_socket, nullptr, nullptr);
+
+    char response[1024];
+	recv(client_socket, response, sizeof(response), 0);
+
+    std::cout << response << std::endl;
 }
