@@ -4,6 +4,8 @@
 #include <iostream>
 using namespace std;
 
+const int BUFFER_SIZE = 1024;
+
 int main(int argc, char const *argv[]) {
     int server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -18,17 +20,32 @@ int main(int argc, char const *argv[]) {
 
     int client_socket = accept(server_socket, nullptr, nullptr);
 
-    char client_response[1024];
+    cout << "Client connected!" << endl;
+
+    char buffer[BUFFER_SIZE];
 
     while(true) {
-        int bytes_received = recv(client_socket, client_response, sizeof(client_response), 0);
+        int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
 
         if (bytes_received == 0) {
             cout << "Client disconnected." << endl;
             close(server_socket);
             break;
         }
+
+        buffer[bytes_received] = '\0';
+        cout << "Client: " << buffer << endl;
+
+        cout << "Server: ";
+        cin.getline(buffer, 1024);
+        string str(buffer);
+
+		if (str == "Stop") {
+			cout << "Connection closed." << endl;
+			close(server_socket);
+		 	break;
+		}
         
-        cout << client_response << endl;
+        send(client_socket, buffer, strlen(buffer), 0);
     }
 }

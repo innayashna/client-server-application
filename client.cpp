@@ -5,6 +5,8 @@
 #include <string>
 using namespace std;
 
+const int BUFFER_SIZE = 1024;
+
 int main(int argc, char const *argv[]) {
 	int client_socket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -15,22 +17,32 @@ int main(int argc, char const *argv[]) {
 
 	connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address));
 
-	cout << "Write your message to server here:" << "\n";
+	cout << "Connected to server!" << endl;
+
+	char buffer[BUFFER_SIZE];
 
 	while(true) {
-		string input_line;
-		getline(cin, input_line);
+		cout << "Client: ";
+        cin.getline(buffer, BUFFER_SIZE);
+		string str(buffer);
 
-		if (input_line.empty()) {
-            break; 
-        } 
-
-		if (input_line == "Stop") {
-			cout << "Connection closed" << endl;
+		if (str == "Stop") {
+			cout << "Connection closed." << endl;
 			close(client_socket);
-			break;
+		 	break;
 		}
 
-		send(client_socket, input_line.c_str(), input_line.length(), 0);
+        send(client_socket, buffer, strlen(buffer), 0);
+
+		int bytes_received = recv(client_socket, buffer, 1024, 0);
+
+        if (bytes_received <= 0) {
+            cout << "Connection closed by server." << endl;
+			close(client_socket);
+            break;
+        }
+
+        buffer[bytes_received] = '\0';
+        cout << "Server: " << buffer << endl;
 	}
 }
