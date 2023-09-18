@@ -8,7 +8,7 @@ using namespace std;
 
 const int BUFFER_SIZE = 1024;
 
-void changePort(int& server_socket, struct sockaddr_in& server_address, char* buffer, int& client_socket);
+void changePort(int& server_socket, struct sockaddr_in& server_address, int& client_socket, int& new_port);
 
 int main(int argc, char const *argv[]) {
     int server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -23,7 +23,6 @@ int main(int argc, char const *argv[]) {
     listen(server_socket, 5);
 
     int client_socket = accept(server_socket, nullptr, nullptr);
-
     cout << "Client connected!" << endl;
 
     while(true) {
@@ -40,9 +39,10 @@ int main(int argc, char const *argv[]) {
         cout << "Client: " << buffer << endl;
 
         if (strncmp(buffer, "NewPort-", 8) == 0) {
-            changePort(server_socket, server_address, buffer, client_socket);
-            send(client_socket, "Success", strlen("Success"), 0);
-            cout << "Client connected via new port!" << endl;
+            int new_port = atoi(buffer + 8);
+            cout << "[Server] Changing port to " << new_port << endl;
+            changePort(server_socket, server_address, client_socket, new_port);
+            cout << "Client connected via new port on client request!" << endl;
         }
 
         cout << "Server: ";
@@ -56,31 +56,42 @@ int main(int argc, char const *argv[]) {
 		}
 
         if (str.find("NewPort-") == 0) {
+            int new_port = atoi(buffer + 8);
+            cout << "[Server] Changing port to " << new_port << endl;
+
             send(client_socket, buffer, strlen(buffer), 0);
-            changePort(server_socket, server_address, buffer, client_socket);
 
             memset(buffer, 0, sizeof(buffer));
             recv(client_socket, buffer, sizeof(buffer), 0);
+
+            if (strcmp(buffer, "Ready") == 0) {
+                changePort(server_socket, server_address, client_socket, new_port);
+            } 
+            
+            memset(buffer, 0, sizeof(buffer));
+            recv(client_socket, buffer, sizeof(buffer), 0);
             cout << "Client: " << buffer << endl;
-            cout << "Client connected via new port!" << endl;
+            cout << "Client connected via new port on server request!" << endl;
         } else {
             send(client_socket, buffer, strlen(buffer), 0);
         }
     }
 }
 
-void changePort(int& server_socket, struct sockaddr_in& server_address, char* buffer, int& client_socket) {
-    int new_port = atoi(buffer + 8);
-    cout << "Changing port to " << new_port << endl;
-    close(server_socket);
+void changePort(int& server_socket, struct sockaddr_in& server_address, int& client_socket, int& new_port) {
     server_address.sin_port = htons(new_port);
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    int new_server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
+    if (bind(new_server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
         cout << "Unable to bind." << endl;
     }
 
-    if (listen(server_socket, 5) < 0) {
+    if (listen(new_server_socket, 5) < 0) {
         cout << "Unable to listen." << endl;
     }
+
+    send(client_socket, "Success", strlen("Success"), 0);
+    close(server_socket);
+    server_socket = new_server_socket;
+    client_socket = accept(server_socket, nullptr, nullptr);
 }
