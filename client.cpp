@@ -11,18 +11,19 @@ const int BUFFER_SIZE = 1024;
 void changePort(int& client_socket, struct sockaddr_in& server_address, int& new_port);
 
 int main(int argc, char const *argv[]) {
+	int port_number = atoi(argv[1]);
 	int client_socket = socket(AF_INET, SOCK_STREAM, 0);
 
 	struct sockaddr_in server_address;
 	server_address.sin_family = AF_INET;
-	server_address.sin_port = htons(7300); 
+	server_address.sin_port = htons(port_number); 
 	server_address.sin_addr.s_addr = INADDR_ANY; 
 
 	connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address));
 
 	cout << "Connected to server!" << endl;
 
-	while(true) {
+	while (true) {
 		char buffer[BUFFER_SIZE];
 		cout << "Client >>> ";
         cin.getline(buffer, BUFFER_SIZE);
