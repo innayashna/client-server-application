@@ -11,7 +11,7 @@ const int BUFFER_SIZE = 1024;
 void change_port(int& client_socket, struct sockaddr_in& server_address, int& new_port);
 
 int main(int argc, char const *argv[]) {
-     if (argc != 2) {
+    if (argc != 2) {
         cout << "Please pass port number as a command-line argument" << endl;
         return -1;
     }
