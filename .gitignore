@@ -1,0 +1,15 @@
+# server
+server/CMakeFiles
+server/cmake_install.cmake
+server/CMakeCache.txt
+server/Makefile
+server/server
+
+# client
+client/CMakeFiles
+client/cmake_install.cmake
+client/CMakeCache.txt
+client/Makefile
+client/client
+
+.vscode
