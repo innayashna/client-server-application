@@ -8,21 +8,26 @@ using namespace std;
 
 const int BUFFER_SIZE = 1024;
 
-void changePort(int& client_socket, struct sockaddr_in& server_address, int& new_port);
+void change_port(int& client_socket, struct sockaddr_in& server_address, int& new_port);
 
 int main(int argc, char const *argv[]) {
+ 	if (argc != 2) {
+        cout << "Please pass port number as a command-line argument" << endl;
+        return -1;
+    }
+
+	int port_number = atoi(argv[1]);
 	int client_socket = socket(AF_INET, SOCK_STREAM, 0);
 
 	struct sockaddr_in server_address;
 	server_address.sin_family = AF_INET;
-	server_address.sin_port = htons(7300); 
+	server_address.sin_port = htons(port_number); 
 	server_address.sin_addr.s_addr = INADDR_ANY; 
 
 	connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address));
-
 	cout << "Connected to server!" << endl;
 
-	while(true) {
+	while (true) {
 		char buffer[BUFFER_SIZE];
 		cout << "Client >>> ";
         cin.getline(buffer, BUFFER_SIZE);
@@ -45,7 +50,7 @@ int main(int argc, char const *argv[]) {
             cout << "Server: " << buffer << endl;
 
 			if (strcmp(buffer, "Success") == 0) {
-				changePort(client_socket, server_address, new_port);
+				change_port(client_socket, server_address, new_port);
 			}
 
 			cout << "Connected to server via new port on client request!" << endl;
@@ -74,7 +79,7 @@ int main(int argc, char const *argv[]) {
 
 			if (strcmp(buffer, "Success") == 0) {
 				memset(buffer, 0, sizeof(buffer));
-				changePort(client_socket, server_address, new_port);
+				change_port(client_socket, server_address, new_port);
 				send(client_socket, "Success", strlen("Success"), 0);
 			}
 			cout << "Connected to server via new port on server request!" << endl;
@@ -82,7 +87,7 @@ int main(int argc, char const *argv[]) {
 	}
 }
 
-void changePort(int& client_socket, struct sockaddr_in& server_address, int& new_port) {
+void change_port(int& client_socket, struct sockaddr_in& server_address, int& new_port) {
     server_address.sin_port = htons(new_port);
 	int new_client_socket = socket(AF_INET, SOCK_STREAM, 0);
 
