@@ -15,7 +15,6 @@ int main(int argc, char const *argv[]) {
         cout << "Please pass port number as a command-line argument" << endl;
         return -1;
     }
-
 	int port_number = atoi(argv[1]);
 	int client_socket = socket(AF_INET, SOCK_STREAM, 0);
 
