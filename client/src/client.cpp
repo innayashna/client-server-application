@@ -49,7 +49,6 @@ int main(int argc, char const *argv[]) {
         //Change port on client request
         if (str.find(change_port_command) == 0) {
             int new_port = atoi(buffer + strlen(change_port_command));
-            cout << "[Client] Changing port to: " << new_port << endl;
 
             send(client_socket, buffer, strlen(buffer), 0);
 
@@ -58,6 +57,7 @@ int main(int argc, char const *argv[]) {
             cout << "Server: " << buffer << endl;
 
             if (strcmp(buffer, "Success") == 0) {
+                cout << "[Client] Changing port to: " << new_port << endl;
                 change_port(client_socket, server_address, new_port);
                 cout << "[Client] Connected to server via new port on client request!" << endl;
             }

@@ -7,7 +7,7 @@
 using namespace std;
 
 const int BUFFER_SIZE = 1024;
-const int MAX_CONNECTIONS = 5;
+const int MAX_CONNECTIONS = 1;
 const int MAX_PORT = 49151;
 const int MIN_PORT = 1024;
 const char* change_port_command = "NewPort-";
@@ -87,17 +87,17 @@ int main(int argc, char const *argv[]) {
             //Change port on server request
             if (str.find(change_port_command) == 0) {
                 int new_port = atoi(buffer + strlen(change_port_command));
-                cout << "[Server] Changing port to: " << new_port << endl;
 
                 send(client_socket, buffer, strlen(buffer), 0);
 
                 memset(buffer, 0, sizeof(buffer));
                 recv(client_socket, buffer, sizeof(buffer), 0);
 
-                if (strcmp(buffer, "Failure") == 0) {
+                if (strncmp(buffer, "Failure", strlen("Failure")) == 0) {
                     cout << "Client: " << buffer << endl;
                 } else {
                     if (strcmp(buffer, "Ready") == 0) {
+                        cout << "[Server] Changing port to: " << new_port << endl;
                         change_port(server_socket, server_address, client_socket, new_port);
                     } 
                     
