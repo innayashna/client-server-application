@@ -3,13 +3,14 @@
 #include <unistd.h>
 #include <iostream>
 #include <string>
+#include <cstring>
 
-using namespace std;
+using namespace std; // Get rid of it
 
-const int BUFFER_SIZE = 1024;
-const int MAX_PORT = 49151;
-const int MIN_PORT = 1024;
-const char* change_port_command = "NewPort-";
+static constexpr int BUFFER_SIZE = 1024;
+static constexpr int MAX_PORT = 49151;
+static constexpr int MIN_PORT = 1024;
+static constexpr char* change_port_command = "NewPort-";
 
 void change_port(int& client_socket, struct sockaddr_in& server_address, int& new_port);
 

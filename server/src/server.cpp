@@ -3,9 +3,11 @@
 #include <unistd.h>
 #include <iostream>
 #include <string>
+#include <cstring>
 
 using namespace std;
 
+// use constexpr
 const int BUFFER_SIZE = 1024;
 const int MAX_CONNECTIONS = 1;
 const int MAX_PORT = 49151;
@@ -44,7 +46,7 @@ int main(int argc, char const *argv[]) {
         }
 
         cout << "[Server] Ready to accep clients!" << endl;
-        int client_socket = accept(server_socket, nullptr, nullptr);
+        int client_socket = accept(server_socket, nullptr, nullptr); // error not handled
         cout << "[Client] Client connected!" << endl;
 
         while (true) {
@@ -63,7 +65,7 @@ int main(int argc, char const *argv[]) {
             if (strncmp(buffer, change_port_command, strlen(change_port_command)) == 0) {
                 int new_port = atoi(buffer + strlen(change_port_command));
 
-                if (MAX_PORT < new_port || new_port < MIN_PORT) {
+                if (MAX_PORT < new_port || new_port < MIN_PORT) { // good
                     char failure_message[] = "Failure. Client entered unsupported port number!";
                     send(client_socket, failure_message, strlen(failure_message), 0);
                 } else {
@@ -118,13 +120,14 @@ void change_port(int& server_socket, struct sockaddr_in& server_address, int& cl
     int new_server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
     if (bind(new_server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
-        cout << "[Server] Unable to bind." << endl;
+        cout << "[Server] Unable to bind." << endl; // print errno
         send(client_socket, "Failure", strlen("Failure"), 0);
     }
 
     if (listen(new_server_socket, MAX_CONNECTIONS) < 0) {
         cout << "[Server] Unable to listen." << endl;
         send(client_socket, "Failure", strlen("Failure"), 0);
+        // Success ???
     }
 
     send(client_socket, "Success", strlen("Success"), 0);
